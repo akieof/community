@@ -23,7 +23,7 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(path="/index",method = RequestMethod.GET)
+    @RequestMapping(path="/",method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page){
 
         //设置页码相关参数

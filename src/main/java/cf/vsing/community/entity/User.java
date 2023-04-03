@@ -1,6 +1,7 @@
 package cf.vsing.community.entity;
 
 import javax.xml.crypto.Data;
+import java.util.Date;
 
 public class User {
     private  int id;
@@ -12,7 +13,7 @@ public class User {
     private int status;
     private  String activationCode;
     private  String headerUrl;
-    private  Data creatTime;
+    private  Date creatTime;
 
 
     public int getId() {
@@ -87,11 +88,11 @@ public class User {
         this.headerUrl = headerUrl;
     }
 
-    public Data getCreatTime() {
+    public Date getCreatTime() {
         return creatTime;
     }
 
-    public void setCreatTime(Data creatTime) {
+    public void setCreatTime(Date creatTime) {
         this.creatTime = creatTime;
     }
 
