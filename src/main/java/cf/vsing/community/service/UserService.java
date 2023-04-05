@@ -4,6 +4,7 @@ import cf.vsing.community.dao.UserMapper;
 import cf.vsing.community.entity.User;
 import cf.vsing.community.util.CommunityUtil;
 import cf.vsing.community.util.MailClientUtil;
+import cf.vsing.community.util.StatusUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,13 +12,12 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.xml.crypto.Data;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class UserService {
+public class UserService implements StatusUtil{
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -31,7 +31,7 @@ public class UserService {
         return userMapper.selectById(id);
     }
 
-    public Map<String,Object> regist(User user){
+    public Map<String,Object> register(User user){
         Map<String, Object> map=new HashMap<>();
 
         //非法值处理
@@ -67,7 +67,7 @@ public class UserService {
         user.setStatus(0);
         user.setActivationCode(CommunityUtil.generateUUID());
         user.setHeaderUrl("http://images.nowcoder.com/head/1.png");
-        user.setCreatTime(new Date());
+        user.setCreateTime(new Date());
         userMapper.insertUser(user);
 
         String activationUrl=domain+"/activation/"+user.getId()+"/"+user.getActivationCode();
@@ -78,5 +78,20 @@ public class UserService {
         mailClientUtil.sendMail(user.getEmail(),"Vsing邮箱验证",emailText);
 
         return map;
+    }
+
+    public int activation(int userId,String activationCode){
+        User user=userMapper.selectById(userId);
+
+        if(user==null){
+           return ACTIVATION_NULL;
+        } else if(user.getStatus()==1){
+            return ACTIVATION_REPEAT;
+        } else if (user.getActivationCode().equals(activationCode)) {
+            userMapper.updateStatus(userId,1);
+            return ACTIVATION_OK;
+        }else {
+            return ACTIVATION_WRONG;
+        }
     }
 }
