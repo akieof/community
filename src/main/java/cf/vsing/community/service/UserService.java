@@ -30,7 +30,7 @@ public class UserService implements StatusUtil {
     private MailClientUtil mailClientUtil;
     @Autowired
     private TemplateEngine templateEngine;
-    @Value("${project.domain}")
+    @Value("${project.path.domain}")
     private String domain;
 
 
@@ -161,5 +161,11 @@ public class UserService implements StatusUtil {
         } else {
             return ACTIVATION_WRONG;
         }
+    }
+    public int updateHeaderUrl(int userId,String headerUrl){
+        return userMapper.updateHeader(userId,headerUrl);
+    }
+    public int updatePassword(int userId,String password){
+        return userMapper.updatePassword(userId,password);
     }
 }

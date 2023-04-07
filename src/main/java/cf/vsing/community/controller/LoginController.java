@@ -22,14 +22,32 @@ public class LoginController implements StatusUtil {
     @Autowired
     private UserService userService;
 
+
+    @RequestMapping(path = "/login/register", method = RequestMethod.GET)
+    public String goRegister() {
+        return "/site/register";
+    }
     @RequestMapping(path = "/login", method = RequestMethod.GET)
     public String goLogin() {
         return "/site/login";
     }
 
-    @RequestMapping(path = "/login/register", method = RequestMethod.GET)
-    public String goRegister() {
-        return "/site/register";
+
+
+    @RequestMapping(path = "/login/register", method = RequestMethod.POST)
+    public String register(Model model, User user) {
+        Map<String, Object> msg = userService.register(user);
+        if (msg == null || msg.isEmpty()) {
+            model.addAttribute("msg", "注册成功，请查看邮箱激活账号");
+            model.addAttribute("target", "/login");
+            return "/site/operate-result";
+        } else {
+            model.addAttribute("usernameMsg", msg.get("usernameMsg"));
+            model.addAttribute("passwordMsg", msg.get("passwordMsg"));
+            model.addAttribute("emailMsg", msg.get("emailMsg"));
+            return "/site/register";
+        }
+
     }
 
 
@@ -66,21 +84,13 @@ public class LoginController implements StatusUtil {
 
     }
 
-    @RequestMapping(path = "/login/register", method = RequestMethod.POST)
-    public String register(Model model, User user) {
-        Map<String, Object> msg = userService.register(user);
-        if (msg == null || msg.isEmpty()) {
-            model.addAttribute("msg", "注册成功，请查看邮箱激活账号");
-            model.addAttribute("target", "/login");
-            return "/site/operate-result";
-        } else {
-            model.addAttribute("usernameMsg", msg.get("usernameMsg"));
-            model.addAttribute("passwordMsg", msg.get("passwordMsg"));
-            model.addAttribute("emailMsg", msg.get("emailMsg"));
-            return "/site/register";
-        }
 
+    @RequestMapping(path = "/logout",method = RequestMethod.GET)
+    public String logout(@CookieValue("ticket") String ticket){
+        userService.logout(ticket);
+        return "redirect:/";
     }
+
 
     @RequestMapping(path = "/activation/{userId}/{activationCode}", method = RequestMethod.GET)
     public String activation(Model model, @PathVariable("userId") int userId, @PathVariable("activationCode") String activationCode) {
@@ -100,10 +110,5 @@ public class LoginController implements StatusUtil {
         }
         return "/site/operate-result";
     }
-    @RequestMapping(path = "/logout",method = RequestMethod.GET)
-    public String logout(@CookieValue("ticket") String ticket){
-        userService.logout(ticket);
 
-        return "redirect:/";
-    }
 }
